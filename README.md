@@ -1,93 +1,137 @@
-# Campus-Local AI Chat Platform
+# Campus AI Chat Platform
 
-A locally deployed AI-powered web platform that operates entirely within a campus Wi-Fi network, enabling students to interact with a large language model hosted on local infrastructure without requiring cloud services.
+> 🔒 **100% Private** • ⚡ **Real-time Streaming** • 🎯 **One-Command Setup**
 
-## 🎯 Overview
+A locally deployed AI chat platform for campus networks. All data stays on campus servers with zero cloud dependencies.
 
-This platform provides:
-- **Local AI Access**: Chat with a ~1B parameter language model running on campus infrastructure
-- **Data Privacy**: All interactions stay within the campus network
-- **Real-time Streaming**: See responses generate token-by-token
-- **Educational Value**: Learn about AI deployment and infrastructure
-- **Simple Setup**: Automated installation with minimal manual configuration
+---
 
 ## ✨ Features
 
-- Real-time AI chat interface accessible via web browser
-- Streaming responses for better user experience
-- Support for 2-3 concurrent users
-- No authentication required (Phase 1 MVP)
-- No data persistence (privacy-focused)
-- Runs entirely on local infrastructure
+- **🤖 Local AI Inference** - Run AI models entirely on campus hardware
+- **💬 Real-time Streaming** - See responses generate token-by-token
+- **👥 Multi-user Support** - Handle concurrent users with request queue
+- **🎨 Modern UI** - ChatGPT-style interface with dark mode
+- **💻 Code Highlighting** - Syntax highlighting for 190+ languages
+- **📝 Markdown Support** - Full markdown rendering in responses
+- **⚙️ Admin Panel** - Unified CLI for all platform management
+- **⚡ Fast Setup** - One command installs everything
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-
-- Python 3.10 or higher
-- 8GB RAM minimum (16GB recommended)
-- 5GB available disk space
-- Campus Wi-Fi connection
+- Python 3.8 or higher
+- 4GB+ RAM (8GB+ recommended)
+- ~1-5GB disk space (depending on model)
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd local_run
-   ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/dhruvbhadhotiya/local-run.git
+cd local-run
 
-2. **Run the setup script** (Coming in Phase 4)
-   ```bash
-   python setup.py
-   ```
+# 2. Run automated setup
+python setup.py
 
-3. **Start the server**
-   ```bash
-   python server.py
-   ```
+# 3. Start the server
+# Windows:
+.\start.bat
 
-4. **Access the interface**
-   - Open browser and navigate to `http://<server-ip>:8080`
+# Linux/Mac:
+./start.sh
 
-## 📋 Current Status
+# 4. Open browser at http://localhost:8080
+```
 
-**Phase 1** (In Progress): Project Setup & Backend Foundation
-- ✅ Repository structure
-- ✅ Documentation files
-- 🔄 Backend implementation
-- ⏳ Model loading
-- ⏳ API endpoints
+### Admin Control Panel
 
-## 🛠️ Tech Stack
-
-- **Backend**: Python + FastAPI
-- **Inference**: llama-cpp-python / transformers
-- **Model**: TinyLlama-1.1B-Chat
-- **Frontend**: HTML/CSS/JavaScript (vanilla)
-- **Streaming**: Server-Sent Events (SSE)
-
-## 📖 Documentation
-
-- [Product Requirements Document](PRD.md)
-- [Development Roadmap](roadmap.md)
-- Setup Guide (Coming soon)
-- Troubleshooting (Coming soon)
-
-## 🤝 Contributing
-
-Contributions are welcome! This is an educational project designed to help students learn about AI deployment.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Hugging Face for model hosting and libraries
-- TinyLlama team for the excellent small language model
-- Open-source AI community
+```bash
+# Full platform management
+python admin.py
+```
 
 ---
 
-**Made with ❤️ for campus learning**
+## ⚙️ Configuration
+
+Edit `config.env` file to customize:
+
+```bash
+# Server Settings
+HOST=0.0.0.0
+PORT=8080
+MAX_CONCURRENT_USERS=3
+
+# Model Settings
+MODEL_PATH=models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+USE_GPU=false
+MAX_TOKENS=512
+TEMPERATURE=0.7
+```
+
+---
+
+## 🎯 Available Models
+
+| Model | Size | Quality | Use Case |
+|-------|------|---------|----------|
+| **TinyLlama 1.1B** | ~668 MB | Good | Testing, limited resources |
+| **Phi-2 2.7B** | ~1.6 GB | Better | Balanced quality/performance |
+| **Mistral 7B** | ~4.1 GB | Best | Production, high quality |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend**: FastAPI, Python 3.8+
+- **AI Engine**: llama-cpp-python
+- **Frontend**: Vanilla JS, HTML5, CSS3
+- **Libraries**: marked.js (markdown), highlight.js (code)
+
+---
+
+## 📁 Project Structure
+
+```
+local-run/
+├── frontend/           # Web interface
+├── src/               # Backend source code
+├── scripts/           # Setup & utility scripts
+├── models/            # AI model files
+├── logs/              # Application logs
+├── admin.py           # Admin control panel
+├── setup.py           # One-command installer
+├── server.py          # Main application
+└── config.env         # Configuration file
+```
+
+---
+
+## 🔧 Utility Scripts
+
+```bash
+# Platform management
+python admin.py
+
+# Download/switch models
+python scripts/download_model.py
+
+# Interactive configuration
+python scripts/configure.py
+
+# Health check
+python scripts/health_check.py
+```
+
+---
+
+## 📝 License
+
+MIT License - See [LICENSE](LICENSE) file
+
+---
+
+Made with ❤️ for campus communities

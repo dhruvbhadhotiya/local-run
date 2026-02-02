@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     log_file: str = "./logs/server.log"
     
     class Config:
-        env_file = ".env"
+        env_file = "config.env"  # Using config.env to avoid conflict with .env venv
         env_file_encoding = "utf-8"
         case_sensitive = False
 

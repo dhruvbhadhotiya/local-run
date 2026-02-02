@@ -7,7 +7,7 @@ Downloads GGUF models from HuggingFace Hub automatically
 import os
 import sys
 from pathlib import Path
-from huggingface_hub import hf_hub_download, list_repo_files
+from huggingface_hub import hf_hub_download
 from tqdm import tqdm
 
 
@@ -124,26 +124,26 @@ def download_model(model_config):
 
 
 def update_env_file(model_config):
-    """Update .env file with model information"""
+    """Update config.env file with model information"""
     project_root = Path(__file__).parent.parent
-    env_file = project_root / ".env"
+    config_file = project_root / "config.env"  # Using config.env to avoid conflict with .env venv
     env_example = project_root / ".env.example"
     
-    if not env_file.exists() and env_example.exists():
+    if not config_file.exists() and env_example.exists():
         # Copy from example
         import shutil
-        shutil.copy(env_example, env_file)
-        print(f"\n✓ Created .env from .env.example")
+        shutil.copy(env_example, config_file)
+        print(f"\n✓ Created config.env from .env.example")
     
-    if env_file.exists():
-        # Update MODEL_PATH in .env
-        with open(env_file, 'r') as f:
+    if config_file.exists():
+        # Update MODEL_PATH in config.env
+        with open(config_file, 'r') as f:
             lines = f.readlines()
         
         model_path = f"models/{model_config['filename']}"
         updated = False
         
-        with open(env_file, 'w') as f:
+        with open(config_file, 'w') as f:
             for line in lines:
                 if line.startswith('MODEL_PATH='):
                     f.write(f'MODEL_PATH={model_path}\n')
@@ -152,7 +152,7 @@ def update_env_file(model_config):
                     f.write(line)
         
         if updated:
-            print(f"✓ Updated .env with model path: {model_path}")
+            print(f"✓ Updated config.env with model path: {model_path}")
 
 
 def main():
@@ -190,7 +190,7 @@ def main():
         print("="*60)
         print("\n✓ Model downloaded and configured successfully!")
         print("\nNext steps:")
-        print("  1. Review your .env file")
+        print("  1. Review your config.env file")
         print("  2. Start the server: python server.py")
         print("  3. Open browser: http://localhost:8080")
         return 0

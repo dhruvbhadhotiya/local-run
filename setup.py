@@ -106,14 +106,14 @@ def download_model():
 
 
 def configure_environment():
-    """Configure .env file"""
+    """Configure config.env file"""
     print_step(5, 6, "Configuring environment")
     
-    env_file = Path(".env")
+    config_file = Path("config.env")  # Using config.env to avoid conflict with .env venv
     env_example = Path(".env.example")
     
-    if env_file.exists():
-        print(f"✓ .env file already configured")
+    if config_file.exists():
+        print(f"✓ config.env already configured")
         return True
     
     if not env_example.exists():
@@ -122,12 +122,12 @@ def configure_environment():
     
     try:
         import shutil
-        shutil.copy(env_example, env_file)
-        print(f"✓ Created .env from template")
-        print(f"  You can edit .env to customize settings")
+        shutil.copy(env_example, config_file)
+        print(f"✓ Created config.env from template")
+        print(f"  You can edit config.env to customize settings")
         return True
     except Exception as e:
-        print(f"✗ Failed to create .env: {e}")
+        print(f"✗ Failed to create config.env: {e}")
         return False
 
 
@@ -141,9 +141,9 @@ def verify_installation():
     venv_path = Path(".env")
     checks.append(("Virtual environment", venv_path.exists()))
     
-    # Check .env file
-    env_path = Path(".env")
-    checks.append((".env configuration", env_path.exists()))
+    # Check config.env file
+    config_path = Path("config.env")
+    checks.append(("config.env configuration", config_path.exists()))
     
     # Check models directory
     models_dir = Path("models")

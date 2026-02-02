@@ -34,6 +34,7 @@ models/
 # Environment and Configuration
 .env
 *.env
+config.env
 !.env.example
 
 # Logs
@@ -55,6 +56,11 @@ logs/
 # OS
 Thumbs.db
 .DS_Store
+
+# Node (not needed, but just in case)
+node_modules/
+package.json
+package-lock.json
 
 # Testing
 .pytest_cache/
