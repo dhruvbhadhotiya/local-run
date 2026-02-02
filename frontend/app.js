@@ -1,6 +1,6 @@
 /**
- * Campus AI Chat - Frontend Application
- * Handles streaming responses and user interactions
+ * Campus AI Chat - Enhanced Frontend Application
+ * Features: Markdown rendering, dark mode, code highlighting, example prompts
  */
 
 // Configuration
@@ -14,16 +14,21 @@ const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const clearBtn = document.getElementById('clearBtn');
 const serverStatus = document.getElementById('serverStatus');
+const themeToggle = document.getElementById('themeToggle');
 
 // State
 let isGenerating = false;
 let messageCount = 0;
+let isDarkMode = localStorage.getItem('darkMode') === 'true';
 
 /**
  * Initialize the application
  */
 async function init() {
     console.log('🚀 Campus AI Chat initialized');
+
+    // Apply saved theme
+    applyTheme(isDarkMode);
 
     // Check server status
     await checkServerStatus();
@@ -34,8 +39,47 @@ async function init() {
     // Auto-resize textarea
     setupTextareaAutoResize();
 
+    // Configure marked for markdown rendering
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function (code, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                try {
+                    return hljs.highlight(code, { language: lang }).value;
+                } catch (err) { }
+            }
+            return hljs.highlightAuto(code).value;
+        }
+    });
+
     // Focus input
     userInput.focus();
+}
+
+/**
+ * Apply theme (light or dark)
+ */
+function applyTheme(dark) {
+    isDarkMode = dark;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    localStorage.setItem('darkMode', dark);
+
+    // Toggle icons
+    const sunIcon = themeToggle.querySelector('.icon-sun');
+    const moonIcon = themeToggle.querySelector('.icon-moon');
+
+    if (dark) {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+        document.getElementById('highlight-light').disabled = true;
+        document.getElementById('highlight-dark').disabled = false;
+    } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+        document.getElementById('highlight-light').disabled = false;
+        document.getElementById('highlight-dark').disabled = true;
+    }
 }
 
 /**
@@ -75,6 +119,23 @@ function setupEventListeners() {
     // Clear button click
     clearBtn.addEventListener('click', handleClearChat);
 
+    // Theme toggle
+    themeToggle.addEventListener('click', () => {
+        applyTheme(!isDarkMode);
+    });
+
+    // Example prompt clicks
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.prompt-card')) {
+            const prompt = e.target.closest('.prompt-card').dataset.prompt;
+            userInput.value = prompt;
+            userInput.focus();
+            // Auto-resize
+            userInput.style.height = 'auto';
+            userInput.style.height = Math.min(userInput.scrollHeight, 200) + 'px';
+        }
+    });
+
     // Enter key to send (Shift+Enter for newline)
     userInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -93,7 +154,7 @@ function setupEventListeners() {
 function setupTextareaAutoResize() {
     userInput.addEventListener('input', function () {
         this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
     });
 }
 
@@ -136,7 +197,7 @@ async function handleSendMessage() {
         await streamResponse(message, assistantMsgId);
     } catch (error) {
         console.error('Streaming error:', error);
-        updateMessageText(assistantMsgId, '❌ Error: Could not generate response. Please try again.');
+        showErrorMessage(assistantMsgId, error.message);
     } finally {
         setGenerating(false);
         removeTypingIndicator(assistantMsgId);
@@ -155,29 +216,54 @@ function addMessage(role, text, id = null, showTyping = false) {
     messageEl.id = messageId;
 
     messageEl.innerHTML = `
-        <div class="message-avatar">${avatar}</div>
-        <div class="message-content">
-            ${showTyping ? `
-                <div class="typing-indicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            ` : `
-                <div class="message-text">${escapeHtml(text)}</div>
-                ${role === 'assistant' ? `
-                    <div class="message-actions">
-                        <button class="btn-copy" onclick="copyMessage('${messageId}')">📋 Copy</button>
+        <div class="message-wrapper">
+            <div class="message-avatar">${avatar}</div>
+            <div class="message-content">
+                ${showTyping ? `
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
                     </div>
-                ` : ''}
-            `}
+                ` : `
+                    <div class="message-text">${role === 'user' ? escapeHtml(text) : renderMarkdown(text)}</div>
+                    ${role === 'assistant' ? `
+                        <div class="message-actions">
+                            <button class="btn-copy" onclick="copyMessage('${messageId}')">📋 Copy</button>
+                        </div>
+                    ` : ''}
+                `}
+            </div>
         </div>
     `;
 
     chatMessages.appendChild(messageEl);
-    scrollToBottom();
+
+    // Apply syntax highlighting if code blocks exist
+    if (role === 'assistant') {
+        messageEl.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    }
+
+    scrollToBottom(true); // Force scroll for new messages
 
     return messageId;
+}
+
+/**
+ * Render markdown to HTML
+ */
+function renderMarkdown(text) {
+    if (!text) return '';
+
+    try {
+        const html = marked.parse(text);
+        return html;
+    } catch (error) {
+        console.error('Markdown rendering error:', error);
+        return escapeHtml(text);
+    }
 }
 
 /**
@@ -198,7 +284,7 @@ async function streamResponse(prompt, messageId) {
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
     }
 
     const reader = response.body.getReader();
@@ -242,8 +328,16 @@ async function streamResponse(prompt, messageId) {
                 const unescaped = token.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
 
                 fullText += unescaped;
-                textEl.textContent = fullText;
-                scrollToBottom();
+
+                // Update with rendered markdown
+                textEl.innerHTML = renderMarkdown(fullText);
+
+                // Apply syntax highlighting
+                textEl.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+
+                scrollToBottom(); // Smart scroll during streaming
             } else if (line.startsWith('event: done')) {
                 console.log('✅ Stream complete');
             } else if (line.startsWith('event: error')) {
@@ -254,23 +348,29 @@ async function streamResponse(prompt, messageId) {
 
     // Final update
     if (fullText) {
-        textEl.textContent = fullText;
+        textEl.innerHTML = renderMarkdown(fullText);
+        textEl.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
     } else {
         textEl.textContent = '(No response generated)';
     }
 }
 
 /**
- * Update message text
+ * Show error message
  */
-function updateMessageText(messageId, text) {
+function showErrorMessage(messageId, errorText) {
     const messageEl = document.getElementById(messageId);
     if (!messageEl) return;
 
-    const textEl = messageEl.querySelector('.message-text');
-    if (textEl) {
-        textEl.textContent = text;
-    }
+    const contentEl = messageEl.querySelector('.message-content');
+    contentEl.innerHTML = `
+        <div class="error-message">
+            <strong>❌ Error:</strong> ${escapeHtml(errorText)}
+            <br><small>Please check your connection and try again.</small>
+        </div>
+    `;
 }
 
 /**
@@ -326,6 +426,23 @@ function handleClearChat() {
             <div class="welcome-icon">👋</div>
             <h2>Welcome to Campus AI Chat</h2>
             <p>Your local AI assistant is ready to help. All conversations stay private on campus servers.</p>
+            
+            <div class="example-prompts">
+                <h3>Try asking:</h3>
+                <button class="prompt-card" data-prompt="Explain quantum computing in simple terms">
+                    <span class="prompt-icon">💡</span>
+                    <span class="prompt-text">Explain quantum computing in simple terms</span>
+                </button>
+                <button class="prompt-card" data-prompt="Write a Python function to calculate fibonacci numbers">
+                    <span class="prompt-icon">💻</span>
+                    <span class="prompt-text">Write a Python function to calculate fibonacci numbers</span>
+                </button>
+                <button class="prompt-card" data-prompt="What are the benefits of local AI deployment?">
+                    <span class="prompt-icon">🔒</span>
+                    <span class="prompt-text">What are the benefits of local AI deployment?</span>
+                </button>
+            </div>
+            
             <div class="feature-pills">
                 <span class="pill">🔒 100% Private</span>
                 <span class="pill">⚡ Real-time Streaming</span>
@@ -383,13 +500,3 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
-
-// Add fadeOut animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeOut {
-        from { opacity: 1; transform: scale(1); }
-        to { opacity: 0; transform: scale(0.95); }
-    }
-`;
-document.head.appendChild(style);

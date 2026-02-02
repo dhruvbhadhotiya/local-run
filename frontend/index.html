@@ -1,20 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campus AI Chat</title>
     <meta name="description" content="Local AI-powered chat platform for campus networks">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+        id="highlight-light">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+        id="highlight-dark" disabled>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
     <!-- Background Effects -->
     <div class="bg-gradient"></div>
     <div class="bg-pattern"></div>
-    
+
     <!-- Main Container -->
     <div class="container">
         <!-- Header -->
@@ -22,9 +41,12 @@
             <div class="logo">
                 <div class="logo-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
                     </svg>
                 </div>
                 <div class="logo-text">
@@ -32,10 +54,28 @@
                     <span class="tagline">Locally Powered Intelligence</span>
                 </div>
             </div>
-            
-            <div class="server-status" id="serverStatus">
-                <div class="status-indicator"></div>
-                <span class="status-text">Connecting...</span>
+
+            <div class="header-actions">
+                <!-- Dark Mode Toggle -->
+                <button class="btn-icon" id="themeToggle" title="Toggle dark mode">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" />
+                        <path
+                            d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style="display: none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+
+                <!-- Server Status -->
+                <div class="server-status" id="serverStatus">
+                    <div class="status-indicator"></div>
+                    <span class="status-text">Connecting...</span>
+                </div>
             </div>
         </header>
 
@@ -47,6 +87,25 @@
                     <div class="welcome-icon">👋</div>
                     <h2>Welcome to Campus AI Chat</h2>
                     <p>Your local AI assistant is ready to help. All conversations stay private on campus servers.</p>
+
+                    <!-- Example Prompts -->
+                    <div class="example-prompts">
+                        <h3>Try asking:</h3>
+                        <button class="prompt-card" data-prompt="Explain quantum computing in simple terms">
+                            <span class="prompt-icon">💡</span>
+                            <span class="prompt-text">Explain quantum computing in simple terms</span>
+                        </button>
+                        <button class="prompt-card"
+                            data-prompt="Write a Python function to calculate fibonacci numbers">
+                            <span class="prompt-icon">💻</span>
+                            <span class="prompt-text">Write a Python function to calculate fibonacci numbers</span>
+                        </button>
+                        <button class="prompt-card" data-prompt="What are the benefits of local AI deployment?">
+                            <span class="prompt-icon">🔒</span>
+                            <span class="prompt-text">What are the benefits of local AI deployment?</span>
+                        </button>
+                    </div>
+
                     <div class="feature-pills">
                         <span class="pill">🔒 100% Private</span>
                         <span class="pill">⚡ Real-time Streaming</span>
@@ -58,29 +117,28 @@
             <!-- Input Area -->
             <div class="input-area">
                 <div class="input-container">
-                    <textarea 
-                        id="userInput" 
-                        placeholder="Ask me anything..." 
-                        rows="1"
-                        maxlength="4096"
-                    ></textarea>
-                    
+                    <textarea id="userInput" placeholder="Ask me anything..." rows="1" maxlength="4096"></textarea>
+
                     <div class="input-actions">
                         <button class="btn-icon" id="clearBtn" title="Clear chat">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path
+                                    d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
                             </svg>
                         </button>
-                        
+
                         <button class="btn-send" id="sendBtn">
                             <span class="btn-text">Send</span>
                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="input-hint">
                     Press <kbd>Enter</kbd> to send • <kbd>Shift + Enter</kbd> for new line
                 </div>
@@ -90,4 +148,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
