@@ -74,6 +74,8 @@ tmp/
 # Phase documentation (local only)
 PHASE*.md
 roadmap.md
-PRD.md
 GITHUB_SETUP.md
 test_concurrent.py
+FRONTEND_ENHANCEMENTS.md
+scripts/__pycache__
+phase4_plan.md
