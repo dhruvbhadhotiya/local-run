@@ -65,12 +65,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routes
+# Include API routes FIRST (before static files)
 app.include_router(router)
 app.include_router(streaming_router)
 
-# Mount static files for frontend (will be added in Phase 3)
-# app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+# Mount static files for frontend LAST (catches all remaining routes)
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 
 def main():
