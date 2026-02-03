@@ -160,7 +160,7 @@ HF_MODEL={HF_MODEL}
     with open(ENV_FILE, 'w') as f:
         f.write(content.format(**config))
     
-    print("✓ Configuration saved")
+    print("[OK] Configuration saved")
 
 
 def get_installed_models() -> list:
@@ -248,8 +248,8 @@ def menu_model_management():
         if installed:
             for model in installed:
                 size_mb = model.stat().st_size / (1024 * 1024)
-                active = "← ACTIVE" if str(model.name) in current_model else ""
-                print(f"  • {model.name} ({size_mb:.0f} MB) {active}")
+                active = "<- ACTIVE" if str(model.name) in current_model else ""
+                print(f"  - {model.name} ({size_mb:.0f} MB) {active}")
         else:
             print("  No models installed")
         
@@ -315,7 +315,7 @@ def download_model_menu():
             local_dir_use_symlinks=False
         )
         
-        print(f"\n✓ Download complete: {downloaded}")
+        print(f"\n[OK] Download complete: {downloaded}")
         
         # Update config
         update = input("\nSet as active model? (Y/n): ").strip().lower()
@@ -323,10 +323,10 @@ def download_model_menu():
             config = load_env()
             config['MODEL_PATH'] = f"models/{model['filename']}"
             save_env(config)
-            print("✓ Model set as active")
+            print("[OK] Model set as active")
         
     except Exception as e:
-        print(f"\n✗ Download failed: {e}")
+        print(f"\n[X] Download failed: {e}")
     
     pause()
 
@@ -355,7 +355,7 @@ def download_custom_model():
         current_token = input("\nEnter HuggingFace token: ").strip()
     
     if not current_token:
-        print("✗ Token required for gated models")
+        print("[X] Token required for gated models")
         pause()
         return
     
@@ -387,7 +387,7 @@ def download_custom_model():
             token=current_token
         )
         
-        print(f"\n✓ Download complete: {downloaded}")
+        print(f"\n[OK] Download complete: {downloaded}")
         
         # Update config
         update = input("\nSet as active model? (Y/n): ").strip().lower()
@@ -397,11 +397,11 @@ def download_custom_model():
             save_env(config)
         
     except Exception as e:
-        print(f"\n✗ Download failed: {e}")
+        print(f"\n[X] Download failed: {e}")
         print("\nPossible issues:")
-        print("  • Invalid token")
-        print("  • Haven't accepted model license")
-        print("  • Wrong repo/filename")
+        print("  - Invalid token")
+        print("  - Haven't accepted model license")
+        print("  - Wrong repo/filename")
     
     pause()
 
@@ -421,7 +421,7 @@ def switch_model_menu(installed: list):
     
     print("\nInstalled Models:\n")
     for i, model in enumerate(installed, 1):
-        active = "← CURRENT" if model.name in current else ""
+        active = "<- CURRENT" if model.name in current else ""
         print(f"  [{i}] {model.name} {active}")
     
     choice = input("\nSelect model number: ").strip()
@@ -431,8 +431,8 @@ def switch_model_menu(installed: list):
         if 0 <= idx < len(installed):
             config['MODEL_PATH'] = f"models/{installed[idx].name}"
             save_env(config)
-            print(f"\n✓ Active model changed to: {installed[idx].name}")
-            print("\n⚠️  Restart server to load new model")
+            print(f"\n[OK] Active model changed to: {installed[idx].name}")
+            print("\n[!] Restart server to load new model")
     except:
         print("Invalid selection")
     
@@ -463,7 +463,7 @@ def delete_model_menu(installed: list):
             confirm = input(f"\nDelete {model.name}? (type 'DELETE' to confirm): ").strip()
             if confirm == 'DELETE':
                 model.unlink()
-                print(f"\n✓ Deleted: {model.name}")
+                print(f"\n[OK] Deleted: {model.name}")
             else:
                 print("Cancelled")
     except:
@@ -497,7 +497,7 @@ def menu_configuration():
         print(f"    Max Tokens:  {config.get('MAX_TOKENS', 'Not set')}")
         print(f"    Temperature: {config.get('TEMPERATURE', 'Not set')}")
         print(f"    Top P:       {config.get('TOP_P', 'Not set')}")
-        print(f"\n  HuggingFace Token: {'✓ Set' if config.get('HF_TOKEN') else '✗ Not set'}")
+        print(f"\n  HuggingFace Token: {'[OK] Set' if config.get('HF_TOKEN') else '[X] Not set'}")
         
         print("\n" + "-" * 40)
         print("\n  [1] Configure server")
@@ -541,8 +541,8 @@ def configure_server():
     if max_users: config['MAX_CONCURRENT_USERS'] = max_users
     
     save_env(config)
-    print("\n✓ Server configuration updated")
-    print("⚠️  Restart server for changes to take effect")
+    print("\n[OK] Server configuration updated")
+    print("[!] Restart server for changes to take effect")
     pause()
 
 
@@ -554,10 +554,10 @@ def tune_parameters():
     config = load_env()
     
     print("\n  Model Parameters Guide:")
-    print("  ─" * 20)
-    print("  • Max Tokens: 128-2048 (response length)")
-    print("  • Temperature: 0.1-1.0 (creativity, 0.7 = balanced)")
-    print("  • Top P: 0.1-1.0 (diversity, 0.9 = recommended)")
+    print("  -" * 20)
+    print("  - Max Tokens: 128-2048 (response length)")
+    print("  - Temperature: 0.1-1.0 (creativity, 0.7 = balanced)")
+    print("  - Top P: 0.1-1.0 (diversity, 0.9 = recommended)")
     print()
     
     max_tokens = input(f"  Max Tokens [{config.get('MAX_TOKENS', '512')}]: ").strip()
@@ -569,8 +569,8 @@ def tune_parameters():
     if top_p: config['TOP_P'] = top_p
     
     save_env(config)
-    print("\n✓ Parameters updated")
-    print("⚠️  Restart server for changes to take effect")
+    print("\n[OK] Parameters updated")
+    print("[!] Restart server for changes to take effect")
     pause()
 
 
@@ -583,8 +583,8 @@ def set_hf_token():
     current = config.get('HF_TOKEN', '')
     
     print("\nHuggingFace token is required for:")
-    print("  • Downloading gated models (Llama, Gemma)")
-    print("  • Private repositories")
+    print("  - Downloading gated models (Llama, Gemma)")
+    print("  - Private repositories")
     print("\nGet token at: https://huggingface.co/settings/tokens\n")
     
     if current:
@@ -596,7 +596,7 @@ def set_hf_token():
     if token:
         config['HF_TOKEN'] = token
         save_env(config)
-        print("\n✓ Token saved")
+        print("\n[OK] Token saved")
     
     pause()
 
@@ -615,7 +615,7 @@ def toggle_gpu():
     print()
     
     if 'Not detected' in gpu_info:
-        print("⚠️  No GPU detected. CPU mode recommended.")
+        print("[!] No GPU detected. CPU mode recommended.")
     
     toggle = input("Toggle GPU? (y/N): ").strip().lower()
     
@@ -623,8 +623,8 @@ def toggle_gpu():
         new_value = 'false' if current.lower() == 'true' else 'true'
         config['USE_GPU'] = new_value
         save_env(config)
-        print(f"\n✓ GPU {'enabled' if new_value == 'true' else 'disabled'}")
-        print("⚠️  Restart server for changes to take effect")
+        print(f"\n[OK] GPU {'enabled' if new_value == 'true' else 'disabled'}")
+        print("[!] Restart server for changes to take effect")
     
     pause()
 
@@ -655,7 +655,7 @@ def reset_config():
             'HF_MODEL': 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
         }
         save_env(config)
-        print("\n✓ Configuration reset to defaults")
+        print("\n[OK] Configuration reset to defaults")
     else:
         print("\nCancelled")
     
@@ -675,11 +675,11 @@ def menu_server_control():
         running, status = check_server_status()
         
         if running:
-            print("\n  Status: 🟢 RUNNING")
+            print("\n  Status: [ONLINE] RUNNING")
             print(f"  Model Loaded: {status.get('model', {}).get('loaded', False)}")
             print(f"  Users: {status.get('current_users', 0)}/{status.get('max_users', 0)}")
         else:
-            print("\n  Status: 🔴 NOT RUNNING")
+            print("\n  Status: [OFFLINE] NOT RUNNING")
         
         config = load_env()
         port = config.get('PORT', '8080')
@@ -715,7 +715,7 @@ def start_server():
     """Start the server"""
     running, _ = check_server_status()
     if running:
-        print("\n⚠️  Server is already running!")
+        print("\n[!] Server is already running!")
         pause()
         return
     
@@ -737,7 +737,7 @@ def start_server():
     
     running, _ = check_server_status()
     if running:
-        print("✓ Server is now running!")
+        print("[OK] Server is now running!")
     else:
         print("Server may still be loading model...")
     
@@ -821,7 +821,7 @@ def menu_system_info():
     if models:
         for m in models:
             size = m.stat().st_size / (1024 * 1024)
-            print(f"    • {m.name} ({size:.0f} MB)")
+            print(f"    - {m.name} ({size:.0f} MB)")
     else:
         print("    None")
     
@@ -829,13 +829,13 @@ def menu_system_info():
     ram_gb = float(info.get('ram_total', '0').replace(' GB', '') or 0)
     
     if ram_gb >= 16:
-        print("    ✓ Can run Mistral 7B, Llama 2 7B")
+        print("    [OK] Can run Mistral 7B, Llama 2 7B")
     elif ram_gb >= 8:
-        print("    ✓ Can run Phi-2, smaller models")
+        print("    [OK] Can run Phi-2, smaller models")
     elif ram_gb >= 4:
-        print("    ✓ Can run TinyLlama")
+        print("    [OK] Can run TinyLlama")
     else:
-        print("    ⚠️ Limited RAM - use smallest models")
+        print("    [!] Limited RAM - use smallest models")
     
     pause()
 
@@ -851,7 +851,7 @@ def main_menu():
         
         # Quick status
         running, status = check_server_status()
-        status_icon = "🟢" if running else "🔴"
+        status_icon = "ONLINE" if running else "OFFLINE"
         print(f"\n  Server: {status_icon} {'Running' if running else 'Stopped'}")
         
         config = load_env()
@@ -859,11 +859,11 @@ def main_menu():
         print(f"  Model:  {model}")
         
         print("\n" + "-" * 40)
-        print("\n  [1] 📦 Model Management")
-        print("  [2] ⚙️  Configuration")
-        print("  [3] 🖥️  Server Control")
-        print("  [4] 📊 System Info")
-        print("  [0] 🚪 Exit")
+        print("\n  [1] Model Management")
+        print("  [2] Configuration")
+        print("  [3] Server Control")
+        print("  [4] System Info")
+        print("  [0] Exit")
         
         choice = input("\nSelect option: ").strip()
         
@@ -876,7 +876,7 @@ def main_menu():
         elif choice == "4":
             menu_system_info()
         elif choice == "0":
-            print("\nGoodbye! 👋\n")
+            print("\nGoodbye!\n")
             break
         else:
             print("Invalid option")
@@ -891,7 +891,7 @@ def main():
         print("\n\nExiting...\n")
         sys.exit(0)
     except Exception as e:
-        print(f"\n✗ Error: {e}")
+        print(f"\n[X] Error: {e}")
         sys.exit(1)
 
 

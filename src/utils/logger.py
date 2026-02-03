@@ -2,6 +2,7 @@
 
 import logging
 import os
+import sys
 from pathlib import Path
 from src.utils.config import settings
 
@@ -17,15 +18,23 @@ def setup_logging():
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     date_format = "%Y-%m-%d %H:%M:%S"
     
+    # Create handlers
+    file_handler = logging.FileHandler(settings.log_file, encoding='utf-8')
+    
+    # Console handler with UTF-8 support for Windows
+    if sys.platform == 'win32':
+        # Use UTF-8 encoding for Windows console
+        console_handler = logging.StreamHandler(stream=sys.stdout)
+        console_handler.stream = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1, closefd=False)
+    else:
+        console_handler = logging.StreamHandler()
+    
     # Configure root logger
     logging.basicConfig(
         level=getattr(logging, settings.log_level.upper()),
         format=log_format,
         datefmt=date_format,
-        handlers=[
-            logging.FileHandler(settings.log_file),
-            logging.StreamHandler()
-        ]
+        handlers=[file_handler, console_handler]
     )
     
     return logging.getLogger(__name__)
@@ -33,3 +42,4 @@ def setup_logging():
 
 # Initialize logger
 logger = setup_logging()
+

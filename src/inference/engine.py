@@ -19,28 +19,34 @@ class ModelEngine:
         
     def load_model(self) -> bool:
         """
-        Load the language model from local storage or download from Hugging Face.
+        Load the language model from local storage.
+        Uses MODEL_PATH from config.env for the model file.
         
         Returns:
             bool: True if model loaded successfully, False otherwise
         """
         try:
-            logger.info(f"Loading model: {settings.hf_model}")
+            # Get model path from settings (MODEL_PATH in config.env)
+            model_path = Path(settings.model_path)
             
-            # Create models directory if it doesn't exist
-            model_dir = Path(settings.model_path)
-            model_dir.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Loading model from: {model_path}")
             
-            # For TinyLlama, we need the GGUF format for llama-cpp-python
-            model_file = "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
-            model_path = model_dir / model_file
-            
-            # Download model if not present
+            # Check if model file exists
             if not model_path.exists():
-                logger.info("Model not found locally. Downloading from Hugging Face...")
-                logger.warning("Model download not implemented yet. Please manually download the model.")
-                logger.info(f"Expected path: {model_path}")
-                return False
+                # If it's a directory, look for .gguf files
+                if model_path.is_dir():
+                    gguf_files = list(model_path.glob("*.gguf"))
+                    if gguf_files:
+                        model_path = gguf_files[0]
+                        logger.info(f"Found model: {model_path.name}")
+                    else:
+                        logger.error(f"No .gguf files found in {model_path}")
+                        logger.info("Run: python scripts/download_model.py")
+                        return False
+                else:
+                    logger.error(f"Model not found: {model_path}")
+                    logger.info("Run: python scripts/download_model.py")
+                    return False
             
             # Load model with llama-cpp-python
             logger.info("Loading model into memory...")
@@ -57,7 +63,7 @@ class ModelEngine:
             )
             
             self.model_loaded = True
-            logger.info("Model loaded successfully!")
+            logger.info(f"Model loaded successfully: {model_path.name}")
             return True
             
         except Exception as e:

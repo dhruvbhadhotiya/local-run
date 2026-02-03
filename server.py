@@ -26,17 +26,17 @@ async def lifespan(app: FastAPI):
     logger.info("Campus AI Chat Platform - Starting Up")
     logger.info("=" * 60)
     logger.info(f"Server: {settings.host}:{settings.port}")
-    logger.info(f"Model: {settings.hf_model}")
+    logger.info(f"Model: {settings.model_path}")
     logger.info("Loading model... This may take a few minutes.")
     
     # Load model
     success = model_engine.load_model()
     
     if success:
-        logger.info("✓ Model loaded successfully!")
+        logger.info("[OK] Model loaded successfully!")
         logger.info(f"Ready to accept connections at http://{settings.host}:{settings.port}")
     else:
-        logger.warning("✗ Model failed to load. Server will start but won't accept chat requests.")
+        logger.warning("[X] Model failed to load. Server will start but won't accept chat requests.")
         logger.warning("Please check model path and configuration.")
     
     logger.info("=" * 60)
